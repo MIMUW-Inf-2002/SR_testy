@@ -57,4 +57,19 @@ mod tests {
             assert_eq!(i, received[i]);
         });
     }
+
+    #[test]
+    #[timeout(1080)]
+    #[repeat(20)]
+    fn test_all_at_once() {
+        let thread_count: usize = 64;
+        let sleep_for: u64 = 1000;
+        let pool = Threadpool::new(thread_count);
+
+        for _ in 0..thread_count {
+            pool.submit(Box::new(move || {
+                std::thread::sleep(std::time::Duration::from_millis(sleep_for));
+            }));
+        }
+    }
 }
