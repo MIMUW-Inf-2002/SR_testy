@@ -72,4 +72,35 @@ mod tests {
             }));
         }
     }
+
+    #[test]
+    #[timeout(1080)]
+    #[repeat(20)]
+    fn test_deterministic_concurrency() {
+        let thread_count: usize = 2;
+        let pool = Threadpool::new(thread_count);
+
+        let (txx, rx) = unbounded();
+
+        let tx = txx.clone();
+        pool.submit(Box::new(move || {
+            std::thread::sleep(std::time::Duration::from_millis(1000));
+            tx.send(0).unwrap();
+        }));
+
+        let tx = txx.clone();
+        pool.submit(Box::new(move || {
+            std::thread::sleep(std::time::Duration::from_millis(1));
+            tx.send(1).unwrap();
+        }));
+
+        let mut received = Vec::new();
+        for _ in 0..thread_count {
+            received.push(rx.recv().unwrap());
+        }
+
+        assert_eq!(thread_count, received.len());
+        assert_eq!(0, received[1]);
+        assert_eq!(1, received[0]);
+    }
 }
