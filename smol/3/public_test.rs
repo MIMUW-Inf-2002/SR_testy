@@ -46,7 +46,7 @@ mod tests {
         let (tx, rx) = unbounded();
 
         for i in 0..n {
-            let mut curr_id = FibonacciModule::create(i % 2, 7, tx.clone());
+            let curr_id = FibonacciModule::create(i % 2, 7, tx.clone());
             if i % 2 == 1 {
                 tx.send(FibonacciSystemMessage::Init { id: curr_id, other: prev_id.unwrap() }).unwrap();
                 tx.send(FibonacciSystemMessage::Init { id: prev_id.unwrap(), other: curr_id }).unwrap();
@@ -61,9 +61,9 @@ mod tests {
     }
 
     #[test]
-    fn talking_to_module_A() {
+    fn talking_to_module_a() {
         let (tx, rx) = unbounded();
-        let module_id = FibonacciModule::create(0, 7, tx.clone());
+        FibonacciModule::create(0, 7, tx.clone());
 
         assert_eq!(rx.len(), 1);
         let mut module = match rx.try_recv().unwrap() {
@@ -84,9 +84,9 @@ mod tests {
     }
 
     #[test]
-    fn talking_to_module_B() {
+    fn talking_to_module_b() {
         let (tx, rx) = unbounded();
-        let module_id = FibonacciModule::create(1, 7, tx.clone());
+        FibonacciModule::create(1, 7, tx.clone());
 
         assert_eq!(rx.len(), 1);
         let mut module = match rx.try_recv().unwrap() {
