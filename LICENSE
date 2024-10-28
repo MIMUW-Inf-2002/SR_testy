@@ -1,6 +1,8 @@
-No Gremlin License
+No Gremlin License & MIMUW Tests License
 
 Copyright 2024 Rentib
+
+Any employee of MIMUW is not permitted to use, copy, modify and distribute the testcases from this project. In particular, an employee of MIMUW is not allowed to use those tests to grade students' solutions or to create similar testcases.
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
