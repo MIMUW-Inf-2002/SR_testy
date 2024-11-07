@@ -407,3 +407,44 @@ async fn started_handlers_finish_after_shutdown() {
     assert_eq!(received_nums, vec![0, 0, 1, 1]);
 }
 
+struct PersonPoker;
+
+#[derive(Clone)]
+struct Poke {
+    module_ref: ModuleRef<PersonPoker>,
+}
+
+#[async_trait::async_trait]
+impl Handler<Poke> for PersonPoker {
+    async fn handle(&mut self, _self_ref: &ModuleRef<Self>, msg: Poke) {
+        let other = msg.module_ref;
+        tokio::time::sleep(Duration::from_millis(100)).await;
+
+        other
+            .send(Poke {
+                module_ref: _self_ref.clone(),
+            })
+            .await;
+    }
+}
+
+#[cfg(tokio_unstable)]
+#[tokio::test(flavor = "current_thread", unhandled_panic = "shutdown_runtime")]
+#[timeout(150)]
+async fn send_doesnt_panic_when_shutdown() {
+    let mut system = System::new().await;
+    let alice_ref = system.register_module(PersonPoker).await;
+    let bob_ref = system.register_module(PersonPoker).await;
+
+    alice_ref
+        .send(Poke {
+            module_ref: bob_ref,
+        })
+        .await;
+    tokio::time::sleep(Duration::from_millis(10)).await;
+    // Bob is not doing anything. At this point alice sleeps before poking Bob, so Bob should
+    // finish, and we want to make sure that alice doesn't panic when trying to send a message
+    // to Bob
+    system.shutdown().await;
+}
+
