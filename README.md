@@ -5,7 +5,7 @@
 W katalogu `smol/` są testy do małych zadań, zarówno oficjalne testy publiczne,
 jak i testy studenckie.
 
-W katalogu `big/` będą znajdować się testy do dużych zadań zaliczeniowych,
+W katalogu `big/` są testy do dużych zadań zaliczeniowych,
 zarówno oficjalne testy publiczne, jak i testy studenckie.
 
 ### Licencja
