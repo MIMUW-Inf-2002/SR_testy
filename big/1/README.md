@@ -7,3 +7,5 @@ In order to enable tokio_unstable, add `.cargo` directory from this repo to `pub
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(tokio_unstable)'] }
 ```
+
+If there are warnings during compilation and they are about tests, then dont be a gremlin and whine about it, but submit some pr or something to fix it.
