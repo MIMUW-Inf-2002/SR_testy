@@ -1,28 +1,20 @@
-use assignment_2_solution::deserialize_register_command;
-use assignment_2_solution::run_register_process;
-use assignment_2_solution::serialize_register_command;
-use assignment_2_solution::ClientCommandHeader;
-use assignment_2_solution::ClientRegisterCommand;
-use assignment_2_solution::ClientRegisterCommandContent;
-use assignment_2_solution::Configuration;
-use assignment_2_solution::PublicConfiguration;
-use assignment_2_solution::RegisterCommand;
-use assignment_2_solution::SectorVec;
-use assignment_2_solution::SystemRegisterCommandContent;
-use assignment_2_solution::MAGIC_NUMBER;
-use assignment_2_test_utils::system::HmacSha256;
-use assignment_2_test_utils::system::RegisterResponseContent;
-use assignment_2_test_utils::system::TestProcessesConfig;
-use assignment_2_test_utils::system::HMAC_TAG_SIZE;
+use assignment_2_solution::{
+    deserialize_register_command, run_register_process, serialize_register_command,
+    ClientCommandHeader, ClientRegisterCommand, ClientRegisterCommandContent, Configuration,
+    PublicConfiguration, RegisterCommand, SectorVec, SystemRegisterCommandContent, MAGIC_NUMBER,
+};
+use assignment_2_test_utils::system::{
+    HmacSha256, RegisterResponseContent, TestProcessesConfig, HMAC_TAG_SIZE,
+};
 use hmac::Mac;
 use ntest::timeout;
 use std::collections::HashMap;
 use tempfile::tempdir;
-use tokio::io::AsyncReadExt;
-use tokio::io::AsyncWriteExt;
-use tokio::net::TcpListener;
-use tokio::net::TcpStream;
-use tokio::time::Duration;
+use tokio::{
+    io::{AsyncReadExt, AsyncWriteExt},
+    net::{TcpListener, TcpStream},
+    time::Duration,
+};
 
 #[tokio::test]
 #[timeout(4000)]
@@ -159,8 +151,6 @@ async fn concurrent_writes_are_serialized() {
         .unwrap();
     tokio::time::sleep(Duration::from_millis(300)).await;
 
-    let (mut receiver, _addr) = listener.accept().await.unwrap();
-
     let mut streams = Vec::new();
     for _ in 0..n_clients {
         streams.push(config.connect(0).await);
@@ -182,6 +172,8 @@ async fn concurrent_writes_are_serialized() {
             )
             .await;
     }
+
+    let (mut receiver, _addr) = listener.accept().await.unwrap();
 
     for stream in &mut streams {
         config.read_response(stream).await.unwrap();
