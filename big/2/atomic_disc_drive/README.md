@@ -5,6 +5,8 @@ This is a small crate that should just execute
 based on a config file.
 
 ## Usage
+Before anything, you need to add `#[derive(Debug)]` to the `Configuration` struct
+in `domain.rs`. (or you can delete logging from `main.rs` here if you don't want logs) 
 ```
 cargo run <path_to_config> <self_rank> <storage_dir>
 ```
