@@ -1,0 +1,10 @@
+[package]
+name = "atomic_disc_drive"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tokio = { version = "1.41", features = ["full"] }
+assignment-2-solution = { path = "../solution" }
+env_logger = "0.11.5"
+log = "0.4.22"
