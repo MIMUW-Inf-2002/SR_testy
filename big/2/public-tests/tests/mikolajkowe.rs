@@ -173,6 +173,12 @@ async fn concurrent_writes_are_serialized() {
             .await;
     }
 
+    let mut receivers = Vec::new();
+    for _ in 0..2 {
+        let (receiver, _addr) = listener.accept().await.unwrap();
+        receivers.push(receiver);
+    }
+
     for stream in &mut streams {
         config.read_response(stream).await.unwrap();
     }
@@ -201,7 +207,7 @@ async fn concurrent_writes_are_serialized() {
     // then
     let mut receiving_set = tokio::task::JoinSet::new();
     for _ in 0..2 {
-        let (mut receiver, _addr) = listener.accept().await.unwrap();
+        let mut receiver = receivers.pop().unwrap();
         let hmac_system_key: [u8; 64] = config.hmac_system_key.clone().try_into().unwrap();
         let hmac_client_key: [u8; 32] = config.hmac_client_key.clone().try_into().unwrap();
 
