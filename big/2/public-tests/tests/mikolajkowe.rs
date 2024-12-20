@@ -173,7 +173,11 @@ async fn concurrent_writes_are_serialized() {
             .await;
     }
 
-    let (mut receiver, _addr) = listener.accept().await.unwrap();
+    let mut receivers = Vec::new();
+    for _ in 0..2 {
+        let (receiver, _addr) = listener.accept().await.unwrap();
+        receivers.push(receiver);
+    }
 
     for stream in &mut streams {
         config.read_response(stream).await.unwrap();
@@ -201,38 +205,44 @@ async fn concurrent_writes_are_serialized() {
     }
 
     // then
+    let mut receiving_set = tokio::task::JoinSet::new();
+    for _ in 0..2 {
+        let mut receiver = receivers.pop().unwrap();
+        let hmac_system_key: [u8; 64] = config.hmac_system_key.clone().try_into().unwrap();
+        let hmac_client_key: [u8; 32] = config.hmac_client_key.clone().try_into().unwrap();
 
-    let hmac_system_key: [u8; 64] = config.hmac_system_key.clone().try_into().unwrap();
-    let mut data_written: HashMap<u64, SectorVec> = HashMap::new();
-    loop {
-        let (message, _) = deserialize_register_command(
-            &mut receiver,
-            &hmac_system_key,
-            &config.hmac_client_key.clone().try_into().unwrap(),
-        )
-        .await
-        .unwrap();
-        let RegisterCommand::System(cmd) = message else {
-            continue;
-        };
-        let SystemRegisterCommandContent::WriteProc {
-            timestamp,
-            write_rank: _,
-            data_to_write,
-        } = cmd.content
-        else {
-            continue;
-        };
+        receiving_set.spawn(async move {
+            let mut data_written: HashMap<u64, SectorVec> = HashMap::new();
+            loop {
+                let (message, _) =
+                    deserialize_register_command(&mut receiver, &hmac_system_key, &hmac_client_key)
+                        .await
+                        .unwrap();
+                let RegisterCommand::System(cmd) = message else {
+                    continue;
+                };
+                let SystemRegisterCommandContent::WriteProc {
+                    timestamp,
+                    write_rank: _,
+                    data_to_write,
+                } = cmd.content
+                else {
+                    continue;
+                };
 
-        if let Some(val) = data_written.get(&timestamp) {
-            assert_eq!(val.0, data_to_write.0);
-        }
+                if let Some(val) = data_written.get(&timestamp) {
+                    assert_eq!(val.0, data_to_write.0);
+                }
 
-        data_written.insert(timestamp, data_to_write);
-        if timestamp >= n_clients {
-            break;
-        }
+                data_written.insert(timestamp, data_to_write);
+                if timestamp >= n_clients {
+                    break;
+                }
+            }
+        });
     }
+    // one of these tasks will get stuck in deserialize_register_command, it's ok
+    receiving_set.join_next().await;
 }
 
 fn log_init() {
