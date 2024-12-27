@@ -62,7 +62,7 @@ async fn bad_hmac() {
     stream
         .read_exact(&mut buf)
         .await
-        .expect("Less data then expected");
+        .expect("Less data than expected");
 
     // asserts for write response
     assert_eq!(&buf[0..4], MAGIC_NUMBER.as_ref());
@@ -121,7 +121,7 @@ async fn bad_sector_number() {
     stream
         .read_exact(&mut buf)
         .await
-        .expect("Less data then expected");
+        .expect("Less data than expected");
 
     // asserts for write response
     assert_eq!(&buf[0..4], MAGIC_NUMBER.as_ref());

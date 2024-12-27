@@ -57,7 +57,7 @@ async fn single_process_system_completes_operations() {
     stream
         .read_exact(&mut buf)
         .await
-        .expect("Less data then expected");
+        .expect("Less data than expected");
 
     // asserts for write response
     assert_eq!(&buf[0..4], MAGIC_NUMBER.as_ref());
