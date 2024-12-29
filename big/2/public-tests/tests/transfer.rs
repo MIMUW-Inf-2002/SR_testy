@@ -248,8 +248,6 @@ async fn test_serialization_errors() {
         },
         content: ClientRegisterCommandContent::Read,
     });
-    let mut sink: Vec<u8> = Vec::new();
-
     // push some garbage to sink
     let mut garbage = vec![0x00_u8; 32];
     // append MAGIC_NUMBER
@@ -258,10 +256,10 @@ async fn test_serialization_errors() {
     garbage.append(&mut vec![0x00_u8; 3]);
 
     // when
-    serialize_register_command(&register_cmd, &mut sink, &[0x00_u8; 32])
+    serialize_register_command(&register_cmd, &mut garbage, &[0x00_u8; 32])
         .await
         .expect("Could not serialize?");
-    let mut slice: &[u8] = &sink[..];
+    let mut slice: &[u8] = &garbage[..];
     let data_read: &mut (dyn tokio::io::AsyncRead + Send + Unpin) = &mut slice;
 
     let (deserialized_cmd, hmac_valid) =
