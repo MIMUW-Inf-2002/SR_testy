@@ -14,7 +14,7 @@ in tokio tasks, which do not cause a test failure by default - if your
 solution panics while exiting from some tokio task, it will not be detected
 by the tests, unless the below options are set.
 
-In order to enable tokio_unstable, add a `.cargo` directory from this repo
+In order to enable tokio_unstable, add the `.cargo` directory from this repo
 (if not already present) to the `public-tests` directory. To make sure that
 it is working, verify that when you run `cargo test` your output is similar
 to this:
@@ -37,5 +37,5 @@ test kwasow_timer_efficiency_test ... ok
 test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.02s
 ```
 
-Pay special attention to the thirs line, where the number of tests is displayed.
+Pay special attention to the third line, where the number of tests is displayed.
 
