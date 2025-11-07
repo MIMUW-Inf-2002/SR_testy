@@ -8,11 +8,14 @@ jak i testy studenckie.
 W katalogu `big/` są testy do dużych zadań zaliczeniowych,
 zarówno oficjalne testy publiczne, jak i testy studenckie.
 
+In the `big_2025/` subdirectory you'll find tests for the big tasks done
+at the 2025/26 edition of the course.
+
 ### Licencja
 
 No Gremlin License
 
-Copyright 2024 Rentib
+Copyright 2024-2025, different authors
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
