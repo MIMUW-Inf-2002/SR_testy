@@ -118,4 +118,36 @@ mod tests {
         let res = storage.get(key2).await;
         assert_eq!(res, None);
     }
+
+    #[tokio::test]
+    #[timeout(500)]
+    async fn key_forbidden_character_3() {
+        let root_storage_dir = tempdir().unwrap();
+        let mut storage = build_stable_storage(root_storage_dir.path().to_path_buf()).await;
+
+        let key = "I_am_user/../../../../../../../../../../../../../../../../../../../I_am_root";
+        let data = [0u8; 16];
+
+        let res = storage.put(key, &data).await;
+        assert!(res.is_ok());
+
+        let res = storage.get(key).await;
+        assert_eq!(res, Some(Vec::from(data)));
+    }
+
+    #[tokio::test]
+    #[timeout(500)]
+    async fn key_forbidden_character_4() {
+        let root_storage_dir = tempdir().unwrap();
+        let mut storage = build_stable_storage(root_storage_dir.path().to_path_buf()).await;
+
+        let key = "I am a key";
+        let data = [0u8; 16];
+
+        let res = storage.put(key, &data).await;
+        assert!(res.is_ok());
+
+        let res = storage.get(key).await;
+        assert_eq!(res, Some(Vec::from(data)));
+    }
 }
